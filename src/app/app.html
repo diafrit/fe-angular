@@ -1,0 +1,73 @@
+<div class="bg-background text-foreground flex min-h-svh flex-col">
+  <header
+    class="bg-primary text-primary-foreground sticky top-0 z-30 flex h-14 items-center gap-3 px-4"
+  >
+    <button
+      hlmBtn
+      type="button"
+      variant="secondary"
+      size="icon"
+      class="shrink-0 md:hidden"
+      (click)="toggleMenu()"
+      [attr.aria-expanded]="menuOpen()"
+      aria-controls="side-nav"
+      aria-label="Menu"
+    >
+      <ng-icon name="lucideMenu" />
+    </button>
+    <span class="min-w-0 flex-1 cursor-default truncate text-lg font-medium"
+      >Frontend Angular Test</span
+    >
+    <button
+      hlmBtn
+      type="button"
+      variant="ghost"
+      size="icon"
+      class="shrink-0 cursor-pointer bg-transparent text-primary-foreground shadow-none hover:bg-transparent hover:text-primary-foreground dark:bg-transparent dark:hover:bg-transparent dark:hover:text-primary-foreground"
+      data-theme-toggle
+      [attr.aria-label]="themeLabel()"
+      [attr.title]="themeLabel()"
+      (click)="toggleTheme()"
+    >
+      @if (theme() === 'dark') {
+        <ng-icon name="lucideSun" />
+      } @else {
+        <ng-icon name="lucideMoon" />
+      }
+    </button>
+  </header>
+  <div class="flex min-h-0 flex-1 flex-col md:flex-row">
+    <nav
+      id="side-nav"
+      class="bg-sidebar text-sidebar-foreground border-sidebar-border w-full flex-col gap-1 border-b p-3 md:flex md:w-60 md:shrink-0 md:border-e md:border-b-0"
+      [class.hidden]="!menuOpen()"
+      [class.flex]="menuOpen()"
+      aria-label="Sections"
+    >
+      <a
+        routerLink="/"
+        routerLinkActive="bg-sidebar-accent text-sidebar-accent-foreground"
+        [routerLinkActiveOptions]="{ exact: true }"
+        ariaCurrentWhenActive="page"
+        class="hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-ring/50 flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium outline-none focus-visible:ring-3"
+        (click)="closeMenu()"
+      >
+        <ng-icon name="lucideLayoutDashboard" />
+        Dashboard
+      </a>
+      <a
+        routerLink="/list"
+        routerLinkActive="bg-sidebar-accent text-sidebar-accent-foreground"
+        ariaCurrentWhenActive="page"
+        class="hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-ring/50 flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium outline-none focus-visible:ring-3"
+        (click)="closeMenu()"
+      >
+        <ng-icon name="lucideList" />
+        List
+      </a>
+    </nav>
+    <main class="bg-muted/40 min-w-0 flex-1 p-4 md:p-6 dark:bg-transparent">
+      <router-outlet />
+    </main>
+  </div>
+</div>

@@ -1,0 +1,65 @@
+<label hlmLabel class="sr-only" [for]="inputId()">{{ label() }}</label>
+<input
+  hlmInput
+  #box
+  [id]="inputId()"
+  type="text"
+  inputmode="numeric"
+  autocomplete="off"
+  spellcheck="false"
+  role="combobox"
+  aria-autocomplete="list"
+  [attr.aria-label]="label()"
+  [attr.aria-expanded]="expanded()"
+  [attr.aria-controls]="listId()"
+  [attr.aria-activedescendant]="activeId()"
+  [placeholder]="placeholder()"
+  [disabled]="disabled()"
+  [value]="text()"
+  [style.padding-inline-end]="text() ? '2rem' : null"
+  (focus)="onFocus()"
+  (blur)="onBlur()"
+  (beforeinput)="onBeforeInput($event)"
+  (input)="onInput($event)"
+  (keydown)="onKeydown($event)"
+/>
+@if (text() && !disabled()) {
+  <button
+    type="button"
+    class="text-muted-foreground hover:text-foreground absolute end-1.5 top-1/2 grid size-5 -translate-y-1/2 place-items-center rounded-sm"
+    aria-label="Clear year"
+    title="Clear"
+    (mousedown)="$event.preventDefault()"
+    (click)="clear()"
+  >
+    <ng-icon name="lucideX" class="size-3.5" />
+  </button>
+}
+@if (expanded()) {
+  <ul
+    [id]="listId()"
+    role="listbox"
+    class="bg-popover text-popover-foreground fixed z-50 max-h-60 overflow-y-auto rounded-md border p-1 shadow-md"
+    [style.top]="panel().top"
+    [style.left]="panel().left"
+    [style.width]="panel().width"
+  >
+    @for (year of matches(); track year; let index = $index) {
+      <li role="presentation">
+        <button
+          type="button"
+          role="option"
+          class="w-full rounded-sm px-2 py-1.5 text-start text-sm"
+          [class.bg-accent]="index === active()"
+          [class.text-accent-foreground]="index === active()"
+          [id]="optionId(year)"
+          [attr.aria-selected]="index === active()"
+          (mousedown)="$event.preventDefault()"
+          (click)="pick(year)"
+        >
+          {{ year }}
+        </button>
+      </li>
+    }
+  </ul>
+}

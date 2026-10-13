@@ -1,0 +1,253 @@
+<h1 class="sr-only">Dashboard</h1>
+<div class="grid min-w-0 items-start gap-4 lg:grid-cols-2">
+  <section hlmCard size="sm" class="min-w-0" aria-labelledby="years-heading">
+    <div hlmCardHeader>
+      <h2 hlmCardTitle id="years-heading">List years with multiple winners</h2>
+    </div>
+    <div hlmCardContent>
+      @let years = yearsState();
+      @if (years.status === 'loading' || years.status === 'idle') {
+        <app-skeleton-rows [count]="3" label="Loading years" />
+      } @else if (years.status === 'error') {
+        <app-async-error [message]="years.message" (retry)="loadYears()">
+          <h3 hlmAlertTitle>Years could not be loaded</h3>
+        </app-async-error>
+      } @else if (years.data.length === 0) {
+        <div hlmEmpty>
+          <div hlmEmptyHeader>
+            <div hlmEmptyTitle>No years with multiple winners.</div>
+          </div>
+        </div>
+      } @else {
+        <div hlmTableContainer>
+          <table hlmTable>
+            <thead hlmTableHeader>
+              <tr hlmTableRow>
+                <th hlmTableHead class="text-center">Year</th>
+                <th hlmTableHead class="text-center">Win Count</th>
+              </tr>
+            </thead>
+            <tbody hlmTableBody>
+              @for (row of years.data; track row.year) {
+                <tr hlmTableRow>
+                  <td hlmTableCell class="text-center tabular-nums">{{ row.year }}</td>
+                  <td hlmTableCell class="text-center tabular-nums">{{ row.winnerCount }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  </section>
+
+  <section hlmCard size="sm" class="min-w-0" aria-labelledby="studios-heading">
+    <div hlmCardHeader>
+      <h2 hlmCardTitle id="studios-heading">Top 3 studios with winners</h2>
+    </div>
+    <div hlmCardContent>
+      @let studios = studiosState();
+      @if (studios.status === 'loading' || studios.status === 'idle') {
+        <app-skeleton-rows [count]="3" label="Loading studios" />
+      } @else if (studios.status === 'error') {
+        <app-async-error [message]="studios.message" (retry)="loadStudios()">
+          <h3 hlmAlertTitle>Studios could not be loaded</h3>
+        </app-async-error>
+      } @else if (studios.data.length === 0) {
+        <div hlmEmpty>
+          <div hlmEmptyHeader>
+            <div hlmEmptyTitle>No studios with wins.</div>
+          </div>
+        </div>
+      } @else {
+        <div hlmTableContainer>
+          <table hlmTable>
+            <thead hlmTableHeader>
+              <tr hlmTableRow>
+                <th hlmTableHead>Name</th>
+                <th hlmTableHead class="text-center">Win Count</th>
+              </tr>
+            </thead>
+            <tbody hlmTableBody>
+              @for (row of studios.data; track row.name) {
+                <tr hlmTableRow>
+                  <td hlmTableCell class="whitespace-normal">{{ row.name }}</td>
+                  <td hlmTableCell class="text-center tabular-nums">{{ row.winCount }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  </section>
+
+  <section hlmCard size="sm" class="min-w-0" aria-labelledby="intervals-heading">
+    <div hlmCardHeader>
+      <h2 hlmCardTitle id="intervals-heading">
+        Producers with longest and shortest interval between wins
+      </h2>
+    </div>
+    <div hlmCardContent class="flex flex-col gap-4">
+      @let intervals = intervalsState();
+      @if (intervals.status === 'loading' || intervals.status === 'idle') {
+        <app-skeleton-rows [count]="2" label="Loading producer intervals" />
+      } @else if (intervals.status === 'error') {
+        <app-async-error [message]="intervals.message" (retry)="loadIntervals()">
+          <h3 hlmAlertTitle>Producer intervals could not be loaded</h3>
+        </app-async-error>
+      } @else {
+        <div class="flex flex-col gap-2">
+          <h3 class="text-sm font-medium">Maximum</h3>
+          @if (intervals.data.max.length === 0) {
+            <div hlmEmpty>
+              <div hlmEmptyHeader>
+                <div hlmEmptyTitle>No producers with a maximum interval.</div>
+              </div>
+            </div>
+          } @else {
+            <div hlmTableContainer>
+              <table hlmTable class="interval-table">
+                <thead hlmTableHeader>
+                  <tr hlmTableRow>
+                    <th hlmTableHead>Producer</th>
+                    <th hlmTableHead class="text-center">Interval</th>
+                    <th hlmTableHead class="text-center">Previous Year</th>
+                    <th hlmTableHead class="text-center">Following Year</th>
+                  </tr>
+                </thead>
+                <tbody hlmTableBody>
+                  @for (row of intervals.data.max; track row.producer + '-' + row.previousWin) {
+                    <tr hlmTableRow>
+                      <td hlmTableCell>{{ row.producer }}</td>
+                      <td hlmTableCell class="text-center tabular-nums">{{ row.interval }}</td>
+                      <td hlmTableCell class="text-center tabular-nums">{{ row.previousWin }}</td>
+                      <td hlmTableCell class="text-center tabular-nums">{{ row.followingWin }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <h3 class="text-sm font-medium">Minimum</h3>
+          @if (intervals.data.min.length === 0) {
+            <div hlmEmpty>
+              <div hlmEmptyHeader>
+                <div hlmEmptyTitle>No producers with a minimum interval.</div>
+              </div>
+            </div>
+          } @else {
+            <div hlmTableContainer>
+              <table hlmTable class="interval-table">
+                <thead hlmTableHeader>
+                  <tr hlmTableRow>
+                    <th hlmTableHead>Producer</th>
+                    <th hlmTableHead class="text-center">Interval</th>
+                    <th hlmTableHead class="text-center">Previous Year</th>
+                    <th hlmTableHead class="text-center">Following Year</th>
+                  </tr>
+                </thead>
+                <tbody hlmTableBody>
+                  @for (row of intervals.data.min; track row.producer + '-' + row.previousWin) {
+                    <tr hlmTableRow>
+                      <td hlmTableCell>{{ row.producer }}</td>
+                      <td hlmTableCell class="text-center tabular-nums">{{ row.interval }}</td>
+                      <td hlmTableCell class="text-center tabular-nums">{{ row.previousWin }}</td>
+                      <td hlmTableCell class="text-center tabular-nums">{{ row.followingWin }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </section>
+
+  <section hlmCard size="sm" class="min-w-0" aria-labelledby="winners-heading">
+    <div hlmCardHeader>
+      <h2 hlmCardTitle id="winners-heading">List movie winners by year</h2>
+    </div>
+    <div hlmCardContent class="flex flex-col gap-4">
+      <form class="flex items-end gap-2" novalidate (submit)="onSearch($event)">
+        <app-year-field
+          class="min-w-0 flex-1"
+          inputId="winner-year"
+          label="Search by year"
+          placeholder="Search by year"
+          [years]="yearOptions()"
+          [value]="winnerYear()"
+          [disabled]="winnersState().status === 'loading'"
+          (commit)="onYearCommit($event)"
+        />
+        <button
+          hlmBtn
+          type="submit"
+          size="icon"
+          variant="outline"
+          aria-label="Search"
+          title="Search"
+          [disabled]="winnersState().status === 'loading'"
+        >
+          @if (winnersState().status === 'loading') {
+            <hlm-spinner />
+          } @else {
+            <ng-icon name="lucideSearch" />
+          }
+        </button>
+      </form>
+
+      @let winners = winnersState();
+      @if (winners.status === 'error') {
+        <app-async-error
+          [message]="winners.message"
+          [showRetry]="winners.year !== undefined"
+          (retry)="retryWinners()"
+        >
+          <h3 hlmAlertTitle>Winners could not be loaded</h3>
+        </app-async-error>
+      }
+
+      @if (winners.status === 'idle') {
+        <div hlmEmpty>
+          <div hlmEmptyHeader>
+            <div hlmEmptyTitle>Search a year to list its winners.</div>
+          </div>
+        </div>
+      } @else if (winners.status === 'loading') {
+        <app-skeleton-rows [count]="2" label="Loading winners" />
+      } @else if (winners.status === 'empty') {
+        <div hlmEmpty>
+          <div hlmEmptyHeader>
+            <div hlmEmptyTitle>No winners found for {{ winners.year }}.</div>
+          </div>
+        </div>
+      } @else if (winners.status === 'ready') {
+        <div hlmTableContainer>
+          <table hlmTable>
+            <thead hlmTableHeader>
+              <tr hlmTableRow>
+                <th hlmTableHead class="text-center">Id</th>
+                <th hlmTableHead class="text-center">Year</th>
+                <th hlmTableHead class="whitespace-normal">Title</th>
+              </tr>
+            </thead>
+            <tbody hlmTableBody>
+              @for (movie of winners.data; track movie.id) {
+                <tr hlmTableRow>
+                  <td hlmTableCell class="text-center tabular-nums">{{ movie.id }}</td>
+                  <td hlmTableCell class="text-center tabular-nums">{{ movie.year }}</td>
+                  <td hlmTableCell class="whitespace-normal">{{ movie.title }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  </section>
+</div>

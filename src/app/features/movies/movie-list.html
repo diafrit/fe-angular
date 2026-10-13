@@ -1,0 +1,166 @@
+<section hlmCard size="sm" class="min-w-0" aria-labelledby="movies-heading">
+  <div hlmCardHeader>
+    <div class="flex items-center gap-2">
+      <h1 hlmCardTitle id="movies-heading">List movies</h1>
+      @if (refreshing()) {
+        <hlm-spinner aria-label="Loading movies" />
+      }
+    </div>
+  </div>
+  <div hlmCardContent class="flex flex-col gap-4">
+    <div hlmTableContainer>
+      <table hlmTable class="movie-table w-max min-w-full">
+        <thead hlmTableHeader>
+          <tr hlmTableRow>
+            <th hlmTableHead class="text-center align-middle">ID</th>
+            <th hlmTableHead>
+              <div class="flex w-36 flex-col gap-2">
+                <span class="text-center">Year</span>
+                <app-year-field
+                  inputId="movie-year"
+                  label="Filter by year"
+                  placeholder="Filter by year"
+                  [years]="yearOptions()"
+                  [value]="yearText()"
+                  (commit)="onYearCommit($event)"
+                />
+              </div>
+            </th>
+            <th hlmTableHead class="align-middle">Title</th>
+            <th hlmTableHead>
+              <div class="flex flex-col gap-2">
+                <span class="text-center">Winner?</span>
+                <label hlmLabel class="sr-only" for="winner-filter">Filter by winner</label>
+                <hlm-native-select
+                  selectId="winner-filter"
+                  class="w-full"
+                  [value]="winnerSelect()"
+                  (valueChange)="onWinnerChange($event)"
+                >
+                  <option hlmNativeSelectOption value="">Yes/No</option>
+                  <option hlmNativeSelectOption value="true">Yes</option>
+                  <option hlmNativeSelectOption value="false">No</option>
+                </hlm-native-select>
+              </div>
+            </th>
+          </tr>
+        </thead>
+        <tbody hlmTableBody>
+          @let view = state();
+          @if (view.status === 'loading' || view.status === 'idle') {
+            <tr hlmTableRow>
+              <td hlmTableCell colspan="4">
+                <app-skeleton-rows [count]="3" label="Loading movies" />
+              </td>
+            </tr>
+          } @else if (view.status === 'error') {
+            <tr hlmTableRow>
+              <td hlmTableCell colspan="4">
+                <app-async-error [message]="view.message" (retry)="retry()">
+                  <h2 hlmAlertTitle>Movies could not be loaded</h2>
+                </app-async-error>
+              </td>
+            </tr>
+          } @else if (view.page.content.length === 0) {
+            <tr hlmTableRow>
+              <td hlmTableCell colspan="4">
+                <div hlmEmpty>
+                  <div hlmEmptyHeader>
+                    <div hlmEmptyTitle>No movies found.</div>
+                    <p hlmEmptyDescription>Try another year or winner filter.</p>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          } @else {
+            @for (movie of view.page.content; track movie.id) {
+              <tr hlmTableRow>
+                <td hlmTableCell class="text-center tabular-nums">{{ movie.id }}</td>
+                <td hlmTableCell class="text-center tabular-nums">{{ movie.year }}</td>
+                <td hlmTableCell>{{ movie.title }}</td>
+                <td hlmTableCell class="text-center">
+                  <span
+                    class="inline-flex min-w-10 items-center justify-center rounded-md px-2 py-0.5 text-xs font-medium"
+                    [class.bg-secondary]="movie.winner"
+                    [class.text-secondary-foreground]="movie.winner"
+                    [class.text-muted-foreground]="!movie.winner"
+                  >
+                    {{ movie.winner ? 'Yes' : 'No' }}
+                  </span>
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+    <p class="text-muted-foreground text-xs md:hidden">Scroll sideways to see the winner column.</p>
+  </div>
+
+  @let ready = state();
+  @if (ready.status === 'ready' && ready.page.totalPages > 0) {
+    <div hlmCardFooter class="justify-center">
+      <nav hlmPagination aria-label="Pagination">
+        <ul hlmPaginationContent>
+          <li
+            hlmPaginationItem
+            [class.pointer-events-none]="ready.page.first"
+            [class.opacity-50]="ready.page.first"
+          >
+            <button
+              type="button"
+              hlmPaginationLink
+              aria-label="First page"
+              title="First page"
+              (click)="goFirst($event)"
+            >
+              <ng-icon name="lucideChevronsLeft" />
+            </button>
+          </li>
+          <li
+            hlmPaginationItem
+            [class.pointer-events-none]="ready.page.first"
+            [class.opacity-50]="ready.page.first"
+          >
+            <hlm-pagination-previous iconOnly (click)="goPrevious($event)" />
+          </li>
+          @for (pageNumber of pageNumbers(); track pageNumber) {
+            <li hlmPaginationItem>
+              <button
+                type="button"
+                hlmPaginationLink
+                [isActive]="pageNumber === ready.page.number + 1"
+                [attr.title]="'Page ' + pageNumber"
+                (click)="goToPage($event, pageNumber)"
+              >
+                {{ pageNumber }}
+              </button>
+            </li>
+          }
+          <li
+            hlmPaginationItem
+            [class.pointer-events-none]="ready.page.last"
+            [class.opacity-50]="ready.page.last"
+          >
+            <hlm-pagination-next iconOnly (click)="goNext($event)" />
+          </li>
+          <li
+            hlmPaginationItem
+            [class.pointer-events-none]="ready.page.last"
+            [class.opacity-50]="ready.page.last"
+          >
+            <button
+              type="button"
+              hlmPaginationLink
+              aria-label="Last page"
+              title="Last page"
+              (click)="goLast($event)"
+            >
+              <ng-icon name="lucideChevronsRight" />
+            </button>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  }
+</section>

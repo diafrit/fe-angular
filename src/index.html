@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Frontend Angular Test</title>
+    <base href="/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <!-- Anti-FOUC: applies the stored theme before Angular boots.
+       The 'theme' key must stay in sync with themeStorageKey in src/app/core/theme.ts. -->
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem('theme');
+          var dark =
+            stored === 'dark' ||
+            (stored !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+          document.documentElement.classList.toggle('dark', dark);
+        } catch {}
+      })();
+    </script>
+    <style>
+      #app-boot {
+        --page: #fafafa;
+        --ink: #18181b;
+        --track: #e4e4e7;
+        --bar: #18181b;
+        position: fixed;
+        inset: 0;
+        z-index: 60;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        margin: 0;
+        background: var(--page);
+        color: var(--ink);
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      }
+
+      html.dark #app-boot {
+        --page: #09090b;
+        --ink: #fafafa;
+        --track: #27272a;
+        --bar: #fafafa;
+      }
+
+      #app-boot .boot-center {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      #app-boot .boot-name {
+        margin: 0;
+        font-size: 1.125rem;
+        font-weight: 500;
+        letter-spacing: -0.01em;
+      }
+
+      #app-boot .boot-track {
+        width: 7.5rem;
+        height: 2px;
+        overflow: hidden;
+        border-radius: 999px;
+        background: var(--track);
+      }
+
+      #app-boot .boot-track span {
+        display: block;
+        width: 40%;
+        height: 100%;
+        border-radius: inherit;
+        background: var(--bar);
+        animation: boot-slide 1.4s ease-in-out infinite;
+      }
+
+      #app-boot [data-boot-status] {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        margin: -1px;
+        padding: 0;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        white-space: nowrap;
+        border: 0;
+      }
+
+      #app-boot [data-boot-retry] {
+        display: none;
+        border: 1px solid currentColor;
+        border-radius: 0.5rem;
+        background: transparent;
+        color: inherit;
+        padding: 0.4rem 0.75rem;
+        font: inherit;
+        cursor: pointer;
+      }
+
+      #app-boot[data-failed='true'] [data-boot-skeleton] {
+        display: none;
+      }
+
+      #app-boot[data-failed='true'] [data-boot-status] {
+        position: static;
+        width: auto;
+        height: auto;
+        margin: 0;
+        overflow: visible;
+        clip: auto;
+        white-space: normal;
+        font-size: 1rem;
+      }
+
+      #app-boot[data-failed='true'] [data-boot-retry] {
+        display: inline-block;
+      }
+
+      @keyframes boot-slide {
+        0% {
+          transform: translateX(-120%);
+        }
+        100% {
+          transform: translateX(280%);
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        #app-boot .boot-track span {
+          transform: translateX(80%);
+          animation: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app-boot" role="status" aria-live="polite">
+      <div class="boot-center" data-boot-skeleton>
+        <p class="boot-name">Frontend Angular Test</p>
+        <div class="boot-track" aria-hidden="true"><span></span></div>
+      </div>
+      <p data-boot-status>Loading</p>
+      <button type="button" data-boot-retry hidden onclick="location.reload()">Reload</button>
+    </div>
+    <app-root></app-root>
+  </body>
+</html>
